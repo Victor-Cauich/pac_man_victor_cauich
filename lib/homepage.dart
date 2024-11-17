@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:pac_man_victor_cauich/path.dart';
 import 'pixel.dart';
+import "player.dart";
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -12,6 +17,7 @@ class _HomePageState extends State<HomePage> {
 
 static int numberInRow = 11; // 11 por cada fila
 int numberOfSquares = numberInRow * 17;
+int player = numberInRow * 15 + 1; // lugar donde el jugador aparecera
 
 List<int> barriers = [
   0,1,2,3,4,5,6,7,8,9,10,  // bloques del borde superior
@@ -22,6 +28,16 @@ List<int> barriers = [
   156,145,134,123,162,151,140,129,158,147,148,149,160,100,101,102,103,114,125,127,116,105,106,107,108 // obstaculos parte inferior
 
 ];
+
+void startGame(){
+  Timer.periodic(const Duration(milliseconds: 150), (timer){
+    if (!barriers.contains(player+1)){ // Si el jugador golpea una barrera este se detendra
+      setState(() {
+      player++;
+      });
+    }
+  });
+}
 
 
 
@@ -40,7 +56,9 @@ List<int> barriers = [
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: numberInRow),
                  itemBuilder: (BuildContext context, int index){
-                  if (barriers.contains(index)){ // bloques que se encuentran en el borde de la cuadricula
+                  if (player == index ){ // bloques que se encuentran en el borde de la cuadricula
+                    return const MyPlayer();
+                    }else if (barriers.contains(index)){ // bloques que se encuentran en el borde de la cuadricula
                     return MyPixel(
                      innerColor: Colors.blue[900],
                      outerColor: Colors.blue[900],
@@ -62,8 +80,11 @@ List<int> barriers = [
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text("Score", style:  TextStyle(color: Colors.white, fontSize: 40),),
-                  Text("P L A Y", style:  TextStyle(color: Colors.white, fontSize: 40),),
+                  const Text("Score", style:  TextStyle(color: Colors.white, fontSize: 40),),
+                  GestureDetector(
+                    onTap: startGame,
+                    child: const Text("P L A Y",
+                    style:  TextStyle(color: Colors.white, fontSize: 40),)),
               ],
               )
               ),

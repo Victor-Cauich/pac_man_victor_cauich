@@ -6,7 +6,7 @@ class MyPath extends StatelessWidget { // clase para el camino por donde Pac Man
     final child;
 
 
-    MyPath({this.innerColor, this.outerColor, this.child});
+    const MyPath({super.key, this.innerColor, this.outerColor, this.child});
 
     @override  
     Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class MyPath extends StatelessWidget { // clase para el camino por donde Pac Man
         child: ClipRRect(
           borderRadius: BorderRadius.circular(6),
           child: Container(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             color: outerColor,
             child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
