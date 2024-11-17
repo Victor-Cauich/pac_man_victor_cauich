@@ -29,16 +29,61 @@ List<int> barriers = [
 
 ];
 
+String direction = "right";
+
 void startGame(){
   Timer.periodic(const Duration(milliseconds: 150), (timer){
-    if (!barriers.contains(player+1)){ // Si el jugador golpea una barrera este se detendra
-      setState(() {
-      player++;
-      });
+
+    switch (direction){
+      case "left":
+      moveLeft();
+      break;
+
+      case "right":
+      moveRight();
+      break;
+
+      case "up":
+      moveUp();
+      break;
+
+      case "down":
+      moveDown();
+      break;
+
     }
+
   });
 }
 
+void moveRight(){
+  if (!barriers.contains(player+1)){ // Si el jugador golpea una barrera este se detendra
+      setState(() {
+      player++; //Pac man se movera a la derecha
+      });
+    }
+}
+void moveLeft(){
+  if (!barriers.contains(player-1)){ // Si el jugador golpea una barrera este se detendra
+      setState(() {
+      player--; //Pac man se movera a la izquierda
+      });
+    }
+}
+void moveUp(){
+  if (!barriers.contains(player - numberInRow)){ // 
+      setState(() {
+      player -= numberInRow; //Pac man se movera hacia el cuadro de arriba
+      });
+    }
+}
+void moveDown(){
+  if (!barriers.contains(player + numberInRow)){ // Si el jugador golpea una barrera este se detendra
+      setState(() {
+      player += numberInRow; //Pac man se movera hacia el cuadro de abajo
+      });  
+    }
+}
 
 
   @override
@@ -49,42 +94,62 @@ void startGame(){
         children: [
           Expanded(
             flex: 5,
-            child: Container(
-              child: GridView.builder(
-                // physics: NeverScrollableScrollPhysics(), // evitar que la cuadricula scrolle
-                itemCount: numberOfSquares,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: numberInRow),
-                 itemBuilder: (BuildContext context, int index){
-                  if (player == index ){ // bloques que se encuentran en el borde de la cuadricula
-                    return const MyPlayer();
-                    }else if (barriers.contains(index)){ // bloques que se encuentran en el borde de la cuadricula
-                    return MyPixel(
-                     innerColor: Colors.blue[900],
-                     outerColor: Colors.blue[900],
-                     // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
-                    );
-                  }else{
-                    return MyPath(
-                     innerColor: Colors.yellow,
-                     outerColor: Colors.black,
-                     // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
-                    );
-                  }
-                 }
-                 ),
-              ),
+            child: GestureDetector(
+              onVerticalDragUpdate: (details){
+                if (details.delta.dy > 0){
+                  direction = "down";
+                }else if (details.delta.dy < 0){
+                  direction = "up";
+                }
+                print(direction); // Verificar en la consola la dirección
+              },
+              onHorizontalDragUpdate: (details){
+                if (details.delta.dx > 0){
+                  direction = "right";
+                }else if (details.delta.dx < 0){
+                  direction = "left";
+                }
+                print(direction); // Verificar en la consola la dirección
+              },
+              child: Container(
+                child: GridView.builder(
+                  // physics: NeverScrollableScrollPhysics(), // evitar que la cuadricula scrolle
+                  itemCount: numberOfSquares,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: numberInRow),
+                   itemBuilder: (BuildContext context, int index){
+                    if (player == index ){ // bloques que se encuentran en el borde de la cuadricula
+                      return const MyPlayer();
+                      }else if (barriers.contains(index)){ // bloques que se encuentran en el borde de la cuadricula
+                      return MyPixel(
+                       innerColor: Colors.blue[900],
+                       outerColor: Colors.blue[900],
+                       // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
+                      );
+                    }else{
+                      return MyPath(
+                       innerColor: Colors.yellow,
+                       outerColor: Colors.black,
+                       // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
+                      );
+                    }
+                   }
+                   ),
+                ),
+            ),
             ),
           Expanded( // Parte inferior de la pantalla 
             child: Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Text("Score", style:  TextStyle(color: Colors.white, fontSize: 40),),
+                  Text("Score", 
+                    style:  TextStyle(color: Colors.white, fontSize: 40),),
                   GestureDetector(
                     onTap: startGame,
-                    child: const Text("P L A Y",
-                    style:  TextStyle(color: Colors.white, fontSize: 40),)),
+                    child: Text("P L A Y",
+                    style:  TextStyle(color: Colors.white, fontSize: 40),
+                    ),),
               ],
               )
               ),
