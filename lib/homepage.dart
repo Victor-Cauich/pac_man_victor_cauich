@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pac_man_victor_cauich/path.dart';
@@ -19,7 +20,7 @@ static int numberInRow = 11; // 11 por cada fila
 int numberOfSquares = numberInRow * 17;
 int player = numberInRow * 15 + 1; // lugar donde el jugador aparecera
 
-List<int> barriers = [
+List<int> barriers = [ // Lista de las barreras del mapa
   0,1,2,3,4,5,6,7,8,9,10,  // bloques del borde superior
   11,22,33,44,55,66,77,99,110,121,132,143,154,165,176, // bloques del borde izquierdo
   177,178,179,180,181,182,183,184,185,186, // bloques del borde inferior
@@ -29,12 +30,25 @@ List<int> barriers = [
 
 ];
 
+List<int> food = []; // Lista de la comida
+
 String direction = "right";
+bool preGame = true;
+bool mouthClosed = false;
 
 void startGame(){
-  Timer.periodic(const Duration(milliseconds: 150), (timer){
+  preGame = false;
+  getFood();
+  Timer.periodic(Duration(milliseconds: 120), (timer){
+    setState(() {
+      mouthClosed = !mouthClosed;
+    });
 
-    switch (direction){
+    if(food.contains(player)){
+      food.remove(player);
+    }
+
+    switch (direction){ // Cambiar la direccion
       case "left":
       moveLeft();
       break;
@@ -54,6 +68,14 @@ void startGame(){
     }
 
   });
+}
+
+void getFood(){ // metodo para obtener comida
+  for(int i=0; i<numberOfSquares; i++){
+    if (!barriers.contains(i)){
+      food.add(i);
+    }
+  }
 }
 
 void moveRight(){
@@ -118,21 +140,52 @@ void moveDown(){
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: numberInRow),
                    itemBuilder: (BuildContext context, int index){
-                    if (player == index ){ // bloques que se encuentran en el borde de la cuadricula
-                      return const MyPlayer();
+                    if(mouthClosed){
+                      return Padding(padding: EdgeInsets.all(4),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.yellow,
+                          shape: BoxShape.circle // Crear un circulo para imitar a un pacman con la boca cerrada
+                        ),
+                      ),);
+                    }
+                    else if (player == index ){ // bloques que se encuentran en el borde de la cuadricula
+
+                      switch(direction){ // Cambiar la direccion de la imagen de pac-man
+                        case"left":
+                        return Transform.rotate(angle: pi, child: MyPlayer(),);
+                        break;
+
+                        case"right":
+                        return MyPlayer();
+                        break;
+
+                        case"up":
+                        return Transform.rotate(angle: 3*pi/2, child: MyPlayer(),);
+                        break;
+
+                        case"down":
+                        return Transform.rotate(angle: pi/2, child: MyPlayer(),);
+                        break;
+
+                        default: return MyPlayer();
+                      }
+
                       }else if (barriers.contains(index)){ // bloques que se encuentran en el borde de la cuadricula
                       return MyPixel(
                        innerColor: Colors.blue[900],
                        outerColor: Colors.blue[900],
                        // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
                       );
+
                     }else{
                       return MyPath(
                        innerColor: Colors.yellow,
                        outerColor: Colors.black,
-                       // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
+                      // child: Text(index.toString()) // Mostrar los numeros de la cuadricula
                       );
                     }
+                    
                    }
                    ),
                 ),
