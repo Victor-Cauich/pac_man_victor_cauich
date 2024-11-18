@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:pac_man_victor_cauich/path.dart';
+import 'ghost.dart';
 import 'pixel.dart';
 import 'player.dart';
 
@@ -16,9 +17,9 @@ class _HomePageState extends State<HomePage> {
   static int numberInRow = 11; // 11 por cada fila
   int numberOfSquares = numberInRow * 17;
   int player = numberInRow * 15 + 1; // lugar donde el jugador aparecerá
+  int ghost = numberInRow +1;
 
-  List<int> barriers = [
-    // Lista de las barreras del mapa
+  List<int> barriers = [ // Lista de las barreras del mapa
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, // borde superior
     11, 22, 33, 44, 55, 66, 77, 99, 110, 121, 132, 143, 154, 165, 176, // borde izquierdo
     177, 178, 179, 180, 181, 182, 183, 184, 185, 186, // borde inferior
@@ -34,8 +35,10 @@ class _HomePageState extends State<HomePage> {
   String direction = "right";
   bool preGame = true;
   bool mouthClosed = false;
+  int score = 0;
 
   void startGame() {
+    moveGhost();
     preGame = false;
     getFood();
     Timer.periodic(Duration(milliseconds: 120), (timer) {
@@ -45,6 +48,11 @@ class _HomePageState extends State<HomePage> {
 
       if (food.contains(player)) { // verificar que pac-man se halla comido la pildora
         food.remove(player);
+        score++; //sumar al score total
+      }
+
+      if (player == ghost){
+        ghost =-1;
       }
 
       switch (direction) {
@@ -59,6 +67,50 @@ class _HomePageState extends State<HomePage> {
           break;
         case "down":
           moveDown();
+          break;
+      }
+    });
+  }
+
+  String ghostDirection = "left"; 
+  void moveGhost() {
+    Duration ghostSpeed = Duration(milliseconds: 500);
+    Timer.periodic(ghostSpeed, (timer) {
+      if (!barriers.contains(ghost - 1) && ghostDirection != "right") {
+        ghostDirection = "left";
+      } else if (!barriers.contains(ghost - numberInRow) &&
+          ghostDirection != "down") {
+        ghostDirection = "up";
+      } else if (!barriers.contains(ghost + numberInRow) &&
+          ghostDirection != "up") {
+        ghostDirection = "down";
+      } else if (!barriers.contains(ghost + 1) && ghostDirection != "left") {
+        ghostDirection = "right";
+      }
+
+      switch (ghostDirection) {
+        case "right":
+          setState(() {
+            ghost++;
+          });
+          break;
+
+        case "up":
+          setState(() {
+            ghost -= numberInRow;
+          });
+          break;
+
+        case "left":
+          setState(() {
+            ghost--;
+          });
+          break;
+
+        case "down":
+          setState(() {
+            ghost += numberInRow;
+          });
           break;
       }
     });
@@ -164,6 +216,8 @@ class _HomePageState extends State<HomePage> {
                           return MyPlayer();
                       }
                     }
+                  } else if (ghost == index) {
+                    return Ghost();
                   } else if (barriers.contains(index)) {
                     return MyPixel(
                       innerColor: Colors.blue[900],
@@ -191,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Score",
+                    "Score: "+ score.toString(),
                     style: TextStyle(color: Colors.white, fontSize: 40),
                   ),
                   GestureDetector(
