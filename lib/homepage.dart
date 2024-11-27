@@ -52,7 +52,8 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
       }
 
       if (player == ghost) { // Verifica si Pac-Man ha tocado al fantasma.
-        ghost = -1; // Elimina al fantasma (lo coloca fuera de la cuadrícula).
+        player = -1; // Elimina al jugador (lo coloca fuera de la cuadrícula).
+        showGameOverDialog();
       }
 
       // Mueve a Pac-Man según la dirección actual.
@@ -81,15 +82,22 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   void moveGhost() { // Método que maneja el movimiento del fantasma.
     Duration ghostSpeed = Duration(milliseconds: 500); // Establece la velocidad del fantasma.
     Timer.periodic(ghostSpeed, (timer) { // Temporizador que mueve al fantasma periódicamente.
+    List<String> possibleDirections = []; // Lista de direcciones posibles.
       if (!barriers.contains(ghost - 1) && ghostDirection != "right") {  // Determina la dirección del fantasma en función de las barreras y límites.
-        ghostDirection = "left"; // Si no hay barrera a la izquierda, el fantasma va a la izquierda.
-      } else if (!barriers.contains(ghost + 1) && ghostDirection != "left") {
-        ghostDirection = "right"; // Si no hay barrera a la derecha, el fantasma va a la derecha.
-      } else if (!barriers.contains(ghost - numberInRow) && ghostDirection != "down") {
-        ghostDirection = "up"; // Si no hay barrera arriba, el fantasma va hacia arriba.
-      } else if (!barriers.contains(ghost + numberInRow) && ghostDirection != "up") {
-        ghostDirection = "down"; // Si no hay barrera abajo, el fantasma va hacia abajo.
+        possibleDirections.add("left"); // Si no hay barrera a la izquierda, el fantasma va a la izquierda.
       } 
+      if (!barriers.contains(ghost + 1) && ghostDirection != "left") {
+        possibleDirections.add("right"); // Si no hay barrera a la derecha, el fantasma va a la derecha.
+      } 
+       if (!barriers.contains(ghost - numberInRow)&& ghostDirection != "down" ) {
+        possibleDirections.add("up"); // Si no hay barrera arriba, el fantasma va hacia arriba.
+      } 
+      if (!barriers.contains(ghost + numberInRow)&& ghostDirection != "up") {
+        possibleDirections.add("down"); // Si no hay barrera abajo, el fantasma va hacia abajo.
+      }
+
+      String newDirection = possibleDirections[Random().nextInt(possibleDirections.length)];
+      ghostDirection = newDirection; // Actualizamos la dirección del fantasma.
 
       // Mueve al fantasma en la dirección determinada.
       switch (ghostDirection) {  // cambia la direccion del fantasma
@@ -157,6 +165,31 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
       });
     }
   }
+
+  // metodo para el cuadro de dialogo que aparece al perder la partida
+void showGameOverDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Evita cerrar el diálogo al tocar fuera de él.
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 24, 39, 241),
+        title: Text(
+          "GAME OVER",
+          style: TextStyle(color: Colors.white, fontSize: 30),
+          textAlign: TextAlign.center,
+        ),
+        content: Text(
+          "\nScore: $score",
+          style: TextStyle(color: Colors.white, fontSize: 20),
+          textAlign: TextAlign.center,
+        ),
+      );
+    },
+  );
+}
+
+  //
 
   @override
   Widget build(BuildContext context) { // Método que construye la interfaz de usuario.
