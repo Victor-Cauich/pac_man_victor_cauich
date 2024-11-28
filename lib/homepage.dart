@@ -17,7 +17,13 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   static int numberInRow = 11; // Establece el número de cuadros por fila en la cuadrícula (11 columnas).
   int numberOfSquares = numberInRow * 17; // Calcula el número total de cuadros en la cuadrícula (11 * 17).
   int player = numberInRow * 15 + 1; // Determina la posición inicial del jugador en la cuadrícula.
-  int ghost = numberInRow + 1; // Determina la posición inicial del fantasma en la cuadrícula.
+  List<int> ghosts = [ // Posiciones iniciales de los 4 fantasmas
+    numberInRow + 1,
+     numberInRow + 9, 
+     numberInRow * 10 + 1, 
+     numberInRow * 10 + 9
+     ]; 
+ 
 
   List<int> barriers = [ // Lista de índices que representan las barreras del mapa (muros y obstáculos).
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, // Borde superior de la cuadrícula.
@@ -46,15 +52,19 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
       setState(() { // establecer un estado
         mouthClosed = !mouthClosed; // Cambia el estado de la boca de Pac-Man cada ciclo.
       });
-
+    
       if (food.contains(player)) { // Verifica si Pac-Man ha comido una píldora.
         food.remove(player); // Elimina la píldora que ha comido Pac-Man.
         score++; // Aumenta el puntaje.
       }
 
-      if (player == ghost) { // Verifica si Pac-Man ha tocado al fantasma.
+      //void checkCollision(){
+        for (int ghost in ghosts){
+          if (player == ghost) { // Verifica si Pac-Man ha tocado al fantasma.
         player = -1; // Elimina al jugador (lo coloca fuera de la cuadrícula).
         showGameOverDialog();
+        break;
+        }
       }
 
       // Mueve a Pac-Man según la dirección actual.
@@ -75,30 +85,38 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
           moveDown(); //  mueve Pac-Man hacia abajo.
           break;
       }
+    
     });
   }
 
-  String ghostDirection = "left"; // Dirección inicial del fantasma.
+ List<String> ghostDirections = ["left", "left", "left", "left"];  // Direcciones iniciales de los 4 fantasmas
 
   void moveGhost() { // Método que maneja el movimiento del fantasma.
     Duration ghostSpeed = Duration(milliseconds: 500); // Establece la velocidad del fantasma.
     Timer.periodic(ghostSpeed, (timer) { // Temporizador que mueve al fantasma periódicamente.
+    for (int i = 0; i < ghosts.length; i++) {
+      String ghostDirection = ghostDirections[i];
+      int ghost = ghosts[i];
     List<String> possibleDirections = []; // Lista de direcciones posibles.
-      if (!barriers.contains(ghost - 1) && ghostDirection != "right") {  // Determina la dirección del fantasma en función de las barreras y límites.
+      if (!barriers.contains(ghost - 1) && ghostDirection != "right"){ //&& (ghost % numberInRow !=0)) {  // Determina la dirección del fantasma en función de las barreras y límites.
         possibleDirections.add("left"); // Si no hay barrera a la izquierda, el fantasma va a la izquierda.
       } 
-      if (!barriers.contains(ghost + 1) && ghostDirection != "left") {
+      if (!barriers.contains(ghost + 1) && ghostDirection != "left" ){//&& ((ghost +1) % numberInRow !=0)) {
         possibleDirections.add("right"); // Si no hay barrera a la derecha, el fantasma va a la derecha.
       } 
-       if (!barriers.contains(ghost - numberInRow)&& ghostDirection != "down" ) {
+       if (!barriers.contains(ghost - numberInRow)&& ghostDirection != "down") {
         possibleDirections.add("up"); // Si no hay barrera arriba, el fantasma va hacia arriba.
       } 
       if (!barriers.contains(ghost + numberInRow)&& ghostDirection != "up") {
         possibleDirections.add("down"); // Si no hay barrera abajo, el fantasma va hacia abajo.
       }
 
-      String newDirection = possibleDirections[Random().nextInt(possibleDirections.length)];
-      ghostDirection = newDirection; // Actualizamos la dirección del fantasma.
+      if (possibleDirections.isNotEmpty){
+        String newDirection = 
+        possibleDirections[Random().nextInt(
+          possibleDirections.length)];
+          ghostDirection =  newDirection; // Actualizamos la dirección del fantasma.
+      }
 
       // hacer que el fantasma se teletransporte de un lado a otro del mapa
       if (ghost == 98) {
@@ -118,30 +136,32 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
       switch (ghostDirection) {  // cambia la direccion del fantasma
         case "right": // Si la dirección del fantasma es derecha
           setState(() {  // Llama a setState para notificar que el estado del widget ha cambiado.
-            ghost++; // Mueve al fantasma a la derecha.
+            ghosts[i]++; // Mueve al fantasma a la derecha.
           });
           break;// Finaliza el bloque del caso
 
         case "up": // Si la dirección del fantasma es arriba
           setState(() { // Llama a setState para notificar que el estado del widget ha cambiado.
-            ghost -= numberInRow; // Mueve al fantasma hacia arriba.
+            ghosts[i] -= numberInRow; // Mueve al fantasma hacia arriba.
           });
           break;// Finaliza el bloque del caso
 
         case "left": // Si la dirección del fantasma es izquierda
           setState(() { // Llama a setState para notificar que el estado del widget ha cambiado.
-            ghost--; // Mueve al fantasma a la izquierda.
+            ghosts[i]--; // Mueve al fantasma a la izquierda.
           });
           break;// Finaliza el bloque del caso
 
         case "down": // Si la dirección del fantasma es abajo
           setState(() { // Llama a setState para notificar que el estado del widget ha cambiado.
-            ghost += numberInRow; // Mueve al fantasma hacia abajo.
+            ghosts[i] += numberInRow; // Mueve al fantasma hacia abajo.
           });
           break;// Finaliza el bloque del caso
+        }
       }
     });
   }
+
 
   void getFood() { // Método para generar la comida en el mapa.
     for (int i = 0; i < numberOfSquares; i++) { // Recorre todos los cuadros del mapa.
@@ -275,7 +295,7 @@ void showGameOverDialog() {
                       }
                     }
 
-                  } else if (ghost == index) { // Si el índice es la posición del fantasma.
+                  } else if (ghosts.contains(index)) { // Si el índice es la posición del fantasma.
                     return Ghost(); // muestra el fantasma
                   } else if (barriers.contains(index)) { // Si el índice es una barrera.
                     return MyPixel( // muestra la "barrera"
