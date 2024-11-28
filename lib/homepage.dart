@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget { // Declara la clase 'HomePage' como un w
   @override
   _HomePageState createState() => _HomePageState(); // Crea el estado asociado con la HomePage.
 }
-
+ 
 class _HomePageState extends State<HomePage> { // Clase privada que contiene el estado de 'HomePage'.
   static int numberInRow = 11; // Establece el número de cuadros por fila en la cuadrícula (11 columnas).
   int numberOfSquares = numberInRow * 17; // Calcula el número total de cuadros en la cuadrícula (11 * 17).
@@ -25,8 +25,9 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
     177, 178, 179, 180, 181, 182, 183, 184, 185, 186, // Borde inferior.
     21, 32, 43, 54, 65, 76, 87, 109, 120, 131, 142, 153, 164, 175, // Borde derecho.
     24, 35, 46, 57, 26, 37, 38, 39, 28, 30, 41, 52, 63, 78, 79, 80, 81, 70, 59, // Obstáculos en la parte superior.
-    61, 72, 83, 84, 85, 86, // Más obstáculos en la parte superior.
-    156, 145, 134, 123, 162, 151, 140, 129, 158, 147, 148, 149, 160, 100, 101, // Obstáculos en la parte inferior.
+    61, 72, 83, 84, 85, 86, // Más obstáculos en la parte superior. 
+    156, 145, 134, 123, 162, 151, 140, 
+    129, 158, 147, 148, 149, 160, 100, 101, // Obstáculos en la parte inferior.
     102, 103, 114, 125, 127, 116, 105, 106, 107, 108 // Más obstáculos en la parte inferior.
   ];
 
@@ -99,6 +100,20 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
       String newDirection = possibleDirections[Random().nextInt(possibleDirections.length)];
       ghostDirection = newDirection; // Actualizamos la dirección del fantasma.
 
+      // hacer que el fantasma se teletransporte de un lado a otro del mapa
+      if (ghost == 98) {
+      // Si el fantasma llega al índice 98, reaparece en 88
+      setState(() {
+        ghost = 88;
+        });
+        }
+      if (ghost == 88) {
+      // Si el fantasma llega al índice 88, reaparece en 98
+      setState(() {
+        ghost = 98;
+        });
+        }
+
       // Mueve al fantasma en la dirección determinada.
       switch (ghostDirection) {  // cambia la direccion del fantasma
         case "right": // Si la dirección del fantasma es derecha
@@ -138,14 +153,24 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
 
   // movimientos que hara pac-man
   void moveRight() { // Mueve a Pac-Man a la derecha si no hay barrera.
-    if (!barriers.contains(player + 1)) { // Verifica si la posición a la derecha del jugador no está bloqueada por una barrera
+  if (player == 98) {
+    // Si el jugador llega al índice 98, reaparece en 88
+    setState(() {
+      player = 88;
+    });
+    } else if (!barriers.contains(player + 1)) { // Verifica si la posición a la derecha del jugador no está bloqueada por una barrera
       setState(() { // Llama a 'setState' para actualizar la interfaz 
         player++; // Aumenta la posición del jugador en el eje horizontal.
       });
     }
   }
   void moveLeft() { // Mueve a Pac-Man a la izquierda si no hay barrera.
-    if (!barriers.contains(player - 1)) { // Verifica si la posición a la izquierda del jugador no está bloqueada por una barrera
+  if (player == 88) {
+    // Si el jugador llega al índice 88, reaparece en 98
+    setState(() {
+      player = 98;
+    });
+    } else if (!barriers.contains(player - 1)) { // Verifica si la posición a la izquierda del jugador no está bloqueada por una barrera
       setState(() { // Llama a 'setState' para actualizar la interfaz
         player--; // Disminuye la posición del jugador en el eje horizontal.
       });
