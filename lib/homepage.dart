@@ -18,11 +18,11 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   int numberOfSquares = numberInRow * 17; // Calcula el número total de cuadros en la cuadrícula (11 * 17).
   int player = numberInRow * 15 + 1; // Determina la posición inicial del jugador en la cuadrícula.
   List<int> ghosts = [ // Posiciones iniciales de los 4 fantasmas
-    numberInRow + 1,
-     numberInRow + 9, 
-     numberInRow * 10 + 1, 
-     numberInRow * 10 + 9
-     ]; 
+    numberInRow + 1, // posicion fantasma 1
+    numberInRow + 9, // posicion fantasma 2
+    numberInRow * 10 + 1, // posicion fantasma 3
+    numberInRow * 10 + 9 // posicion fantasma 4
+    ]; 
  
 
   List<int> barriers = [ // Lista de índices que representan las barreras del mapa (muros y obstáculos).
@@ -62,8 +62,8 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
         for (int ghost in ghosts){
           if (player == ghost) { // Verifica si Pac-Man ha tocado al fantasma.
         player = -1; // Elimina al jugador (lo coloca fuera de la cuadrícula).
-        showGameOverDialog();
-        break;
+        showGameOverDialog(); // mostrar mensaje de Game Over
+        break; // terminar
         }
       }
 
@@ -94,9 +94,9 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   void moveGhost() { // Método que maneja el movimiento del fantasma.
     Duration ghostSpeed = Duration(milliseconds: 500); // Establece la velocidad del fantasma.
     Timer.periodic(ghostSpeed, (timer) { // Temporizador que mueve al fantasma periódicamente.
-    for (int i = 0; i < ghosts.length; i++) {
-      String ghostDirection = ghostDirections[i];
-      int ghost = ghosts[i];
+    for (int i = 0; i < ghosts.length; i++) { // mover fantasma
+      String ghostDirection = ghostDirections[i]; // direccion de los fantasmas de la lista = ghostDirections
+      int ghost = ghosts[i]; // fantasmas de la lista = ghost
     List<String> possibleDirections = []; // Lista de direcciones posibles.
       if (!barriers.contains(ghost - 1) && ghostDirection != "right"){ //&& (ghost % numberInRow !=0)) {  // Determina la dirección del fantasma en función de las barreras y límites.
         possibleDirections.add("left"); // Si no hay barrera a la izquierda, el fantasma va a la izquierda.
@@ -111,24 +111,24 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
         possibleDirections.add("down"); // Si no hay barrera abajo, el fantasma va hacia abajo.
       }
 
-      if (possibleDirections.isNotEmpty){
-        String newDirection = 
-        possibleDirections[Random().nextInt(
-          possibleDirections.length)];
+      if (possibleDirections.isNotEmpty){ // si las posibles direcciones no estan vacias
+        String newDirection = // nueva direccion 
+        possibleDirections[Random().nextInt( // elegir direccion aleatoria
+        possibleDirections.length)]; // entre las posibles direcciones
           ghostDirection =  newDirection; // Actualizamos la dirección del fantasma.
       }
 
       // hacer que el fantasma se teletransporte de un lado a otro del mapa
-      if (ghost == 98) {
+      if (ghost == 98) { // Si el fantasma esta en la csilla 98
       // Si el fantasma llega al índice 98, reaparece en 88
-      setState(() {
-        ghost = 88;
+      setState(() { //Actualizar estado
+        ghost = 88; // mover fantasma en la casilla 88
         });
         }
-      if (ghost == 88) {
+      if (ghost == 88) { // Si el fantasma esta en la casilla 88
       // Si el fantasma llega al índice 88, reaparece en 98
-      setState(() {
-        ghost = 98;
+      setState(() { // actualizar estado
+        ghost = 98; // mover fantasma en la casilla 98
         });
         }
 
@@ -174,9 +174,9 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   // movimientos que hara pac-man
   void moveRight() { // Mueve a Pac-Man a la derecha si no hay barrera.
   if (player == 98) {
-    // Si el jugador llega al índice 98, reaparece en 88
-    setState(() {
-      player = 88;
+    // Si el jugador llega al índice 98, 
+    setState(() { // actualizar estado
+      player = 88; //reaparece en 88
     });
     } else if (!barriers.contains(player + 1)) { // Verifica si la posición a la derecha del jugador no está bloqueada por una barrera
       setState(() { // Llama a 'setState' para actualizar la interfaz 
@@ -187,8 +187,8 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   void moveLeft() { // Mueve a Pac-Man a la izquierda si no hay barrera.
   if (player == 88) {
     // Si el jugador llega al índice 88, reaparece en 98
-    setState(() {
-      player = 98;
+    setState(() { // actualizar estado
+      player = 98; //reaparece en 98
     });
     } else if (!barriers.contains(player - 1)) { // Verifica si la posición a la izquierda del jugador no está bloqueada por una barrera
       setState(() { // Llama a 'setState' para actualizar la interfaz
@@ -212,22 +212,22 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
   }
 
   // metodo para el cuadro de dialogo que aparece al perder la partida
-void showGameOverDialog() {
-  showDialog(
-    context: context,
+void showGameOverDialog() { // metodo para mostrar mensaje de fin del juego
+  showDialog( // mostar un mensaje
+    context: context, //contexto
     barrierDismissible: false, // Evita cerrar el diálogo al tocar fuera de él.
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: const Color.fromARGB(255, 24, 39, 241),
-        title: Text(
-          "GAME OVER",
-          style: TextStyle(color: Colors.white, fontSize: 30),
-          textAlign: TextAlign.center,
+    builder: (BuildContext context) { //constructor
+      return AlertDialog( // retormar AlertDialog
+        backgroundColor: const Color.fromARGB(255, 24, 39, 241), // Color del fondo del mensaje
+        title: Text( // El titulo sera un texto
+          "GAME OVER", // mensaje del titulo del mensaje
+          style: TextStyle(color:Colors.white, fontSize: 30), // formato del texto GAME OVER
+          textAlign: TextAlign.center, // centrar el mensaje
         ),
-        content: Text(
-          "\nScore: $score",
-          style: TextStyle(color: Colors.white, fontSize: 20),
-          textAlign: TextAlign.center,
+        content: Text( // texto
+          "\nScore: $score", // mostar el score del jugador
+          style: TextStyle(color: Colors.white, fontSize: 20), // formato del texto del score
+          textAlign: TextAlign.center,// centrar texto
         ),
       );
     },
