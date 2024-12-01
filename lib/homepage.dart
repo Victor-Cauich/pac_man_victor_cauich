@@ -58,7 +58,6 @@ class _HomePageState extends State<HomePage> { // Clase privada que contiene el 
         score++; // Aumenta el puntaje.
       }
 
-      //void checkCollision(){
         for (int ghost in ghosts){
           if (player == ghost) { // Verifica si Pac-Man ha tocado al fantasma.
         player = -1; // Elimina al jugador (lo coloca fuera de la cuadrícula).
@@ -261,6 +260,7 @@ void showGameOverDialog() { // metodo para mostrar mensaje de fin del juego
                 }
               },
               child: GridView.builder( // Construye la cuadrícula del juego.
+              physics: NeverScrollableScrollPhysics(),
                 itemCount: numberOfSquares, // Número total de cuadros en la cuadrícula.
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount( // Configura el diseño de la cuadrícula con un número fijo de columnas.
                     crossAxisCount: numberInRow), // Configura el número de columnas.
